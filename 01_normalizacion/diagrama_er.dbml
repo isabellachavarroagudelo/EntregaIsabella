@@ -1,0 +1,134 @@
+Table departamento {
+  departamento_id tinyint [pk, increment]
+  nombre nvarchar(40) [unique, not null]
+}
+Table ciudad {
+  ciudad_id smallint [pk, increment]
+  nombre nvarchar(60) [unique, not null]
+  departamento_id tinyint [not null, ref: > departamento.departamento_id]
+}
+Table segmento_cliente {
+  segmento_id tinyint [pk, increment]
+  nombre nvarchar(30) [unique, not null]
+}
+Table canal {
+  canal_id tinyint [pk, increment]
+  nombre nvarchar(30) [unique, not null]
+}
+Table metodo_pago {
+  metodo_pago_id tinyint [pk, increment]
+  nombre nvarchar(40) [unique, not null]
+}
+Table estado_pedido {
+  estado_id tinyint [pk, increment]
+  nombre nvarchar(20) [unique, not null]
+}
+Table novedad_transportadora {
+  novedad_id tinyint [pk, increment]
+  descripcion nvarchar(80) [unique, not null]
+}
+Table cliente {
+  cliente_id int [pk, increment]
+  documento varchar(10) [unique, not null]
+  nombre nvarchar(120) [not null]
+  email nvarchar(120)
+  segmento_id tinyint [not null, ref: > segmento_cliente.segmento_id]
+  direccion nvarchar(200) [not null]
+  ciudad_id smallint [not null, ref: > ciudad.ciudad_id]
+}
+Table cliente_telefono {
+  cliente_id int [not null, ref: > cliente.cliente_id]
+  telefono varchar(15) [not null]
+  es_principal bit [not null]
+  indexes { (cliente_id, telefono) [pk] }
+}
+Table bodega {
+  bodega_id tinyint [pk, increment]
+  codigo varchar(10) [unique, not null]
+  nombre nvarchar(80) [not null]
+  ciudad_id smallint [not null, ref: > ciudad.ciudad_id]
+}
+Table transportadora {
+  transportadora_id tinyint [pk, increment]
+  nombre nvarchar(80) [unique, not null]
+  nit varchar(14) [unique, not null]
+}
+Table proveedor {
+  proveedor_id smallint [pk, increment]
+  nit varchar(14) [unique, not null]
+  nombre nvarchar(100) [not null]
+  ciudad_id smallint [not null, ref: > ciudad.ciudad_id]
+  telefono varchar(15)
+}
+Table categoria {
+  categoria_id tinyint [pk, increment]
+  nombre nvarchar(40) [unique, not null]
+}
+Table subcategoria {
+  subcategoria_id smallint [pk, increment]
+  categoria_id tinyint [not null, ref: > categoria.categoria_id]
+  nombre nvarchar(40) [not null]
+  indexes { (categoria_id, nombre) [unique] }
+}
+Table producto {
+  producto_id int [pk, increment]
+  sku varchar(12) [unique, not null]
+  nombre nvarchar(100) [not null]
+  subcategoria_id smallint [not null, ref: > subcategoria.subcategoria_id]
+  unidad_medida char(3) [not null]
+  peso_kg decimal(7,3) [not null]
+  refrigerado bit [not null]
+  costo_unitario decimal(12,2)
+  proveedor_id smallint [ref: > proveedor.proveedor_id]
+  activo bit [not null]
+  en_catalogo bit [not null]
+}
+Table historial_precio {
+  producto_id int [not null, ref: > producto.producto_id]
+  vigente_desde date [not null]
+  vigente_hasta date
+  precio_lista decimal(12,2) [not null]
+  indexes { (producto_id, vigente_desde) [pk] }
+}
+Table pedido {
+  pedido_id int [pk, increment]
+  codigo_pedido varchar(12) [unique, not null]
+  cliente_id int [not null, ref: > cliente.cliente_id]
+  canal_id tinyint [not null, ref: > canal.canal_id]
+  metodo_pago_id tinyint [not null, ref: > metodo_pago.metodo_pago_id]
+  bodega_id tinyint [not null, ref: > bodega.bodega_id]
+  transportadora_id tinyint [not null, ref: > transportadora.transportadora_id]
+  estado_id tinyint [not null, ref: > estado_pedido.estado_id]
+  ciudad_entrega_id smallint [not null, ref: > ciudad.ciudad_id]
+  direccion_entrega nvarchar(200) [not null]
+  fecha_pedido datetime2 [not null]
+  franja_entrega nvarchar(10) [not null]
+  distancia_km decimal(7,1)
+  fecha_entrega_prometida date [not null]
+  fecha_entrega_real datetime2
+  calificacion_servicio tinyint
+  reclamo bit
+  novedad_id tinyint [ref: > novedad_transportadora.novedad_id]
+}
+Table pedido_linea {
+  pedido_id int [not null, ref: > pedido.pedido_id]
+  linea smallint [not null]
+  producto_id int [not null, ref: > producto.producto_id]
+  cantidad decimal(10,3) [not null]
+  precio_unitario decimal(12,2) [not null]
+  descuento decimal(4,3) [not null]
+  venta_neta decimal(14,2) [note: 'columna calculada']
+  indexes { (pedido_id, linea) [pk] }
+}
+Table via_estado_dia {
+  fecha date [pk]
+  estado_via nvarchar(20) [not null]
+  horas_restriccion tinyint [not null]
+}
+Table clima_dia_ciudad {
+  fecha date [not null]
+  ciudad_id smallint [not null, ref: > ciudad.ciudad_id]
+  lluvia_mm decimal(6,1) [not null]
+  alerta nvarchar(20)
+  indexes { (fecha, ciudad_id) [pk] }
+}

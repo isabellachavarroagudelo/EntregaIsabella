@@ -1,0 +1,17 @@
+{
+  "leidas_csv": 14777,
+  "rechazadas_csv": 284,
+  "candidatas_oltp": 14493,
+  "pedidos_candidatos": 2895,
+  "venta_neta_entregada_pandas": 1348784235.0,
+  "filas_stg_pedidos": 14777,
+  "filas_stg_rechazos": 284,
+  "lineas_oltp": 14493,
+  "lineas_dw": 14493,
+  "pedidos_oltp": 2895,
+  "pedidos_dw": 2895,
+  "venta_neta_entregada_oltp": 1348784235.0,
+  "venta_neta_entregada_dw": 1348784235.0,
+  "venta_neta_entregas_dw": 1348784235.0,
+  "cuadra": true
+}
