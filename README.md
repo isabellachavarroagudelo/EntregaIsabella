@@ -53,6 +53,24 @@ El ETL se puede correr las veces que se quiera: el `stg` se vacía y se vuelve a
 
 Los 284 rechazos son 175 filas duplicadas, 91 con cantidad negativa o cero, 17 con entrega anterior al pedido y 1 con precio 0 sin precio de lista. El detalle de todas las reglas está en `03_etl/reglas_calidad.md`.
 
+## Diagramas y gráficas
+
+**Modelo normalizado (oltp, 20 tablas):** las flechas 1 y N muestran quién depende de quién; `pedido` y `pedido_linea` son el centro.
+
+![Diagrama ER](01_normalizacion/diagrama_er.png)
+
+**Modelo dimensional (dw):** dos tablas de hechos (ventas por línea y entregas por pedido) rodeadas de sus dimensiones. `dim_cliente` y `dim_producto` son SCD tipo 2.
+
+![Diagrama estrella](02_dimensional/diagrama_estrella.png)
+
+**Exploración de los datos para el modelo:** cada gráfica compara el porcentaje de pedidos tardíos según una variable (transportadora, días prometidos, vía, lluvia, día de la semana e historial del cliente).
+
+![Exploración](05_ml/eda.png)
+
+**Curvas de los modelos en el conjunto de prueba:** todos quedan muy por encima del azar (la línea punteada).
+
+![Curvas ROC y precisión-recall](05_ml/curvas.png)
+
 ## Decisiones principales
 
 - **Dos tablas de hechos**: `fact_ventas_linea` (una fila por línea) y `fact_entregas_pedido` (una fila por pedido), porque ventas y entregas se miran con granos distintos.
@@ -67,7 +85,7 @@ Los 284 rechazos son 175 filas duplicadas, 91 con cantidad negativa o cero, 17 c
 2. Año imposible en la fecha del pedido (2205, 2225, 2226, 3 pedidos): se corrige al año de la fecha prometida.
 3. Precio 0: se reemplaza por el precio de lista vigente ese día. Un caso sin precio de lista se rechaza.
 4. Cantidad negativa o cero: se rechaza (no se asume que sea una devolución).
-5. Los 3 SKU que no están en el catálogo (87 líneas) se cargan sin costo y la pregunta 6 los reporta aparte.
+5. Los 3 SKU que no están en el catálogo tienen 87 líneas en el CSV: 85 se cargan (2 se rechazan por otras reglas) y 82 son de pedidos Entregado. Se cargan sin costo y la pregunta 6b reporta esas 82 aparte.
 6. `SKU-3004` viene repetido en el catálogo con dos costos (2.820 y 3.160): dejé la primera fila. Habría que confirmarlo con Compras.
 7. Correos inválidos (121) se dejan vacíos, no los inventé.
 8. Reclamo, calificación, distancia y novedad vacíos se dejan en NULL: el dato no existe.
